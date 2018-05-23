@@ -12,6 +12,9 @@ phpVersions=( "${phpVersions[@]%/}" )
 current="$(curl -fsSL 'https://api.wordpress.org/core/version-check/1.7/' | jq -r '.offers[0].current')"
 sha1="$(curl -fsSL "https://wordpress.org/wordpress-$current.tar.gz.sha1")"
 
+echo "BUILD_WORDPRESS_VERSION=$current" > variables.env
+echo "BUILD_WORDPRESS_SHA1=$sha1" >> variables.env
+
 cliVersion="$(
 	git ls-remote --tags 'https://github.com/wp-cli/wp-cli.git' \
 		| sed -r 's!^[^\t]+\trefs/tags/v([^^]+).*!\1!g' \
