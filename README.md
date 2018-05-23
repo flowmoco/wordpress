@@ -1,4 +1,7 @@
-# https://github.com/docker-library/wordpress
+# Flowmoco Wordpress
+This is a fork of the official wordpress image.  This image removes the volume from the Dockerfiles and builds.  This build is managed by jenkins and gets changes from upstream via Jenkins.
+
+# Documentation from upstream - https://github.com/docker-library/wordpress
 
 ## Maintained by: [the Docker Community](https://github.com/docker-library/wordpress)
 
