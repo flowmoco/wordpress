@@ -40,7 +40,6 @@ RUN set -ex; \
 	mkdir -p /var/www/html; \
 	chown -R www-data:www-data /var/www/html
 WORKDIR /var/www/html
-VOLUME /var/www/html
 
 # pub   2048R/2F6B6B7F 2016-01-07
 #       Key fingerprint = 3B91 9162 5F3B 1F1B F5DD  3B47 673A 0204 2F6B 6B7F
