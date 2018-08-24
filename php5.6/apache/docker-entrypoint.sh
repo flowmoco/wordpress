@@ -90,8 +90,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		WORDPRESS_DB_USER
 		WORDPRESS_DB_PASSWORD
 		WORDPRESS_DB_NAME
-		WORDPRESS_DB_CHARSET
-		WORDPRESS_DB_COLLATE
 		"${uniqueEnvs[@]/#/WORDPRESS_}"
 		WORDPRESS_TABLE_PREFIX
 		WORDPRESS_DEBUG
@@ -124,8 +122,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		: "${WORDPRESS_DB_USER:=root}"
 		: "${WORDPRESS_DB_PASSWORD:=}"
 		: "${WORDPRESS_DB_NAME:=wordpress}"
-		: "${WORDPRESS_DB_CHARSET:=utf8}"
-		: "${WORDPRESS_DB_COLLATE:=}"
 
 		# version 4.4.1 decided to switch to windows line endings, that breaks our seds and awks
 		# https://github.com/docker-library/wordpress/issues/116
@@ -185,8 +181,6 @@ EOPHP
 		set_config 'DB_USER' "$WORDPRESS_DB_USER"
 		set_config 'DB_PASSWORD' "$WORDPRESS_DB_PASSWORD"
 		set_config 'DB_NAME' "$WORDPRESS_DB_NAME"
-		set_config 'DB_CHARSET' "$WORDPRESS_DB_CHARSET"
-		set_config 'DB_COLLATE' "$WORDPRESS_DB_COLLATE"
 
 		for unique in "${uniqueEnvs[@]}"; do
 			uniqVar="WORDPRESS_$unique"
