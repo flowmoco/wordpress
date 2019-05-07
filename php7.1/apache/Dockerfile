@@ -38,12 +38,24 @@ RUN { \
 		echo 'opcache.fast_shutdown=1'; \
 		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
+# https://codex.wordpress.org/Editing_wp-config.php#Configure_Error_Logging
+RUN { \
+		echo 'error_reporting = 4339'; \
+		echo 'display_errors = Off'; \
+		echo 'display_startup_errors = Off'; \
+		echo 'log_errors = On'; \
+		echo 'error_log = /dev/stderr'; \
+		echo 'log_errors_max_len = 1024'; \
+		echo 'ignore_repeated_errors = On'; \
+		echo 'ignore_repeated_source = Off'; \
+		echo 'html_errors = Off'; \
+	} > /usr/local/etc/php/conf.d/error-logging.ini
 
 RUN a2enmod rewrite expires
 
 
-ENV WORDPRESS_VERSION 5.0.2
-ENV WORDPRESS_SHA1 4a6971d35eb92e2fc30034141b1c865e8c156add
+ENV WORDPRESS_VERSION 5.1.1
+ENV WORDPRESS_SHA1 f1bff89cc360bf5ef7086594e8a9b68b4cbf2192
 
 RUN set -ex; \
 	curl -o wordpress.tar.gz -fSL "https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz"; \
