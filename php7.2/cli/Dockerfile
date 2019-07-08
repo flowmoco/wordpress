@@ -1,15 +1,25 @@
 FROM php:7.2-alpine
 
-# install the PHP extensions we need
+# install the PHP extensions we need (https://make.wordpress.org/hosting/handbook/handbook/server-environment/#php-extensions)
 RUN set -ex; \
 	\
 	apk add --no-cache --virtual .build-deps \
+		$PHPIZE_DEPS \
+		imagemagick-dev \
 		libjpeg-turbo-dev \
 		libpng-dev \
 	; \
 	\
 	docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
-	docker-php-ext-install gd mysqli opcache zip; \
+	docker-php-ext-install \
+		bcmath \
+		exif \
+		gd \
+		mysqli \
+		zip \
+	; \
+	pecl install imagick-3.4.4; \
+	docker-php-ext-enable imagick; \
 	\
 	runDeps="$( \
 		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
@@ -21,15 +31,19 @@ RUN set -ex; \
 	apk del .build-deps
 
 # set recommended PHP.ini settings
-# see https://secure.php.net/manual/en/opcache.installation.php
+# excluding opcache due https://github.com/docker-library/wordpress/issues/407
+# https://codex.wordpress.org/Editing_wp-config.php#Configure_Error_Logging
 RUN { \
-		echo 'opcache.memory_consumption=128'; \
-		echo 'opcache.interned_strings_buffer=8'; \
-		echo 'opcache.max_accelerated_files=4000'; \
-		echo 'opcache.revalidate_freq=2'; \
-		echo 'opcache.fast_shutdown=1'; \
-		echo 'opcache.enable_cli=1'; \
-	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
+		echo 'error_reporting = 4339'; \
+		echo 'display_errors = Off'; \
+		echo 'display_startup_errors = Off'; \
+		echo 'log_errors = On'; \
+		echo 'error_log = /dev/stderr'; \
+		echo 'log_errors_max_len = 1024'; \
+		echo 'ignore_repeated_errors = On'; \
+		echo 'ignore_repeated_source = Off'; \
+		echo 'html_errors = Off'; \
+	} > /usr/local/etc/php/conf.d/error-logging.ini
 
 # install wp-cli dependencies
 RUN apk add --no-cache \
@@ -50,8 +64,8 @@ WORKDIR /var/www/html
 # sub   rsa2048 2018-05-31 [E]
 ENV WORDPRESS_CLI_GPG_KEY 63AF7AA15067C05616FDDD88A3A2E8F226F0BC06
 
-ENV WORDPRESS_CLI_VERSION 2.1.0
-ENV WORDPRESS_CLI_SHA512 c2ff556c21c85bbcf11be38d058224f53d3d57a1da45320ecf0079d480063dcdc11b5029b94b0b181c1e3bec84745300cd848d28065c0d3619f598980cc17244
+ENV WORDPRESS_CLI_VERSION 2.2.0
+ENV WORDPRESS_CLI_SHA512 2103f04a5014d629eaa42755815c9cec6bb489ed7b0ea6e77dedb309e8af098ab902b2f9c6369ae4b7cb8cc1f20fbb4dedcda83eb1d0c34b880fa6e8a3ae249d
 
 RUN set -ex; \
 	\

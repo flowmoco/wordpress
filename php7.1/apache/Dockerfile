@@ -1,6 +1,6 @@
 FROM php:7.1-apache
 
-# install the PHP extensions we need
+# install the PHP extensions we need (https://make.wordpress.org/hosting/handbook/handbook/server-environment/#php-extensions)
 RUN set -ex; \
 	\
 	savedAptMark="$(apt-mark showmanual)"; \
@@ -8,11 +8,21 @@ RUN set -ex; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
 		libjpeg-dev \
+		libmagickwand-dev \
 		libpng-dev \
 	; \
 	\
 	docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
-	docker-php-ext-install gd mysqli opcache zip; \
+	docker-php-ext-install -j "$(nproc)" \
+		bcmath \
+		exif \
+		gd \
+		mysqli \
+		opcache \
+		zip \
+	; \
+	pecl install imagick-3.4.4; \
+	docker-php-ext-enable imagick; \
 	\
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
@@ -36,7 +46,6 @@ RUN { \
 		echo 'opcache.max_accelerated_files=4000'; \
 		echo 'opcache.revalidate_freq=2'; \
 		echo 'opcache.fast_shutdown=1'; \
-		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 # https://codex.wordpress.org/Editing_wp-config.php#Configure_Error_Logging
 RUN { \
@@ -54,8 +63,8 @@ RUN { \
 RUN a2enmod rewrite expires
 
 
-ENV WORDPRESS_VERSION 5.1.1
-ENV WORDPRESS_SHA1 f1bff89cc360bf5ef7086594e8a9b68b4cbf2192
+ENV WORDPRESS_VERSION 5.2.2
+ENV WORDPRESS_SHA1 3605bcbe9ea48d714efa59b0eb2d251657e7d5b0
 
 RUN set -ex; \
 	curl -o wordpress.tar.gz -fSL "https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz"; \
