@@ -98,7 +98,6 @@ RUN set -ex; \
 	\
 	wp --allow-root --version
 
-VOLUME /var/www/html
 
 COPY docker-entrypoint.sh /usr/local/bin/
 

@@ -249,7 +249,6 @@ RUN set -ex; \
 	wp --allow-root --version
 {{ ) end -}}
 
-VOLUME /var/www/html
 
 {{ if env.version == "beta" then ( -}}
 COPY --chown=www-data:www-data wp-config-docker.php /usr/src/wordpress/

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
+cd "$(dirname "$(greadlink -f "$BASH_SOURCE")")"
 
 versions=( "$@" )
 if [ "${#versions[@]}" -eq 0 ]; then
@@ -21,7 +21,7 @@ for version in "${versions[@]}"; do
 	if [ "$version" = 'cli' ]; then
 		possibleVersions=( $(
 			git ls-remote --tags 'https://github.com/wp-cli/wp-cli.git' \
-				| sed -r 's!^[^\t]+\trefs/tags/v([^^]+).*$!\1!g' \
+				| gsed -r 's!^[^\t]+\trefs/tags/v([^^]+).*$!\1!g' \
 				| sort --version-sort --reverse
 		) )
 		for possibleVersion in "${possibleVersions[@]}"; do
