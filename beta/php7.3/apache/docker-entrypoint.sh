@@ -51,11 +51,14 @@ if [[ "$1" == apache2* ]] || [ "$1" = 'php-fpm' ]; then
 		fi
 		# loop over "pluggable" content in the source, and if it already exists in the destination, skip it
 		# https://github.com/docker-library/wordpress/issues/506 ("wp-content" persisted, "akismet" updated, WordPress container restarted/recreated, "akismet" downgraded)
-		for contentDir in /usr/src/wordpress/wp-content/*/*/; do
+		for contentDir in \
+			/usr/src/wordpress/.htaccess \
+			/usr/src/wordpress/wp-content/*/*/ \
+		; do
 			contentDir="${contentDir%/}"
 			[ -d "$contentDir" ] || continue
 			contentPath="${contentDir#/usr/src/wordpress/}" # "wp-content/plugins/akismet", etc.
-			if [ -d "$PWD/$contentPath" ]; then
+			if [ -e "$PWD/$contentPath" ]; then
 				echo >&2 "WARNING: '$PWD/$contentPath' exists! (not copying the WordPress version)"
 				sourceTarArgs+=( --exclude "./$contentPath" )
 			fi
@@ -82,6 +85,11 @@ if [[ "$1" == apache2* ]] || [ "$1" = 'php-fpm' ]; then
 					}
 					{ print }
 				' "$wpConfigDocker" > wp-config.php
+				if [ "$uid" = '0' ]; then
+					# attempt to ensure that wp-config.php is owned by the run user
+					# could be on a filesystem that doesn't allow chown (like some NFS setups)
+					chown "$user:$group" wp-config.php || true
+				fi
 				break
 			fi
 		done
