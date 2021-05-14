@@ -61,6 +61,10 @@ define( 'DB_CHARSET', getenv_docker('WORDPRESS_DB_CHARSET', 'utf8') );
 /** The Database Collate type. Don't change this if in doubt. */
 define( 'DB_COLLATE', getenv_docker('WORDPRESS_DB_COLLATE', '') );
 
+/** Enable caching */
+define('WP_CACHE', true);
+define('WPCACHEHOME', __DIR__ . '/wp-content/plugins/wp-super-cache/' );
+
 /**#@+
  * Authentication Unique Keys and Salts.
  *
